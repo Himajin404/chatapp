@@ -4,14 +4,18 @@ from .models import Talk, User
 from django.core.exceptions import ValidationError
 
 TABOO_WORDS = [
-    "あほ",
-    "アホ",
     "ばか",
     "バカ",
+    "あほ",
+    "アホ",
     "Fuck",
     "Shit",
     "Wanker",
     "Cunt",
+    "fuck",
+    "shit",
+    "wanker",
+    "cunt",
     "ファック",
     "ファッキュー",
     "しね",
@@ -28,7 +32,9 @@ TABOO_WORDS = [
     "Whore",
     "Hoe",
     "Nigger",
-    "Fucking",
+    "whore",
+    "hoe",
+    "nigger",
     "ﾀﾋﾈ",
     "ぼけ",
     "ドアホ",
@@ -37,6 +43,31 @@ TABOO_WORDS = [
     "⑨",
     "ブス",
     "ドブス",
+    "sine"
+    "雑魚"
+    "ざこ"
+    "ざっこ"
+    "mf",
+    "fck",
+    "fk",
+    "fUck",
+    "fuCk",
+    "fucK",
+    "FUck",
+    "FuCk",
+    "FucK",
+    "FUCk"
+    "FUCK"
+    "fUCk"
+    "fUCK"
+    "noob"
+    "Noob"
+    "L"
+    "ass",
+    "Ass"
+    "Pussy",
+    "pussy",
+    "今どんな気持ち？"
 ]
 
 class SignUpForm(UserCreationForm):
@@ -47,7 +78,7 @@ class SignUpForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     pass
 
-class TalkForm(forms.Form):
+class TalkForm(forms.ModelForm):
     class Meta:
         model = Talk
         fields = ("message",)
