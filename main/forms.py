@@ -37,8 +37,6 @@ TABOO_WORDS = [
     "⑨",
     "ブス",
     "ドブス",
-    "",
-    "",
 ]
 
 class SignUpForm(UserCreationForm):
@@ -49,7 +47,7 @@ class SignUpForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     pass
 
-class TalkForm(forms.ModelForm):
+class TalkForm(forms.Form):
     class Meta:
         model = Talk
         fields = ("message",)
