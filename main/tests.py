@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .forms import TalkForm
-from .models import Talk
+from .models import Talk, User  # User を追加
 
 class TestTalkModel(TestCase):  # TestCase を継承するのを忘れないように。
     @classmethod
@@ -89,3 +89,66 @@ class TestSignupView(TestCase):
         self.assertEqual(res.status_code, 200)
         # レンダリングに使用されるテンプレートの検証をしています。
         self.assertTemplateUsed(res, "main/signup.html")
+
+class TestWithAuthMixin:
+    """ログインが必要なテストクラスで継承する"""
+
+    @classmethod
+    def setUpTestData(cls):
+        # ログインする前にデータベースにテスターを登録しておく必要がある。
+        cls._username = "test太郎"
+        cls._email = "test@example.com"
+        cls._password = "thisistest"
+        cls.user = User.objects.create_user(
+            username=cls._username, email=cls._email, password=cls._password
+        )
+
+    def login(self):
+        return self.client.login(
+            username=self._username, password=self._password
+        )
+
+class TestTalkRoomView(TestWithAuthMixin, TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._good_form = {"message": "こんにちは今日もプログラミングを頑張るぞ"}
+        cls._bad_form = {"message": "彼はバカというよりかはあほだ"}
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls._friend_username = "friend太郎"
+        cls._friend_email = "friend@example.com"
+        cls._friend_password = "thisistest"
+        cls._friend = User.objects.create_user(
+            username=cls._friend_username,
+            email=cls._friend_email,
+            password=cls._friend_password,
+        )
+        cls._talk_room_url = f"/talk_room/{cls._friend.id}"
+
+    def test_get(self):
+        self.login()
+        res = self.client.get(self._talk_room_url)
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, "main/talk_room.html")
+
+    def test_valid_post(self):
+        self.login()
+        res = self.client.post(self._talk_room_url, self._good_form)
+        self.assertRedirects(
+            res,
+            self._talk_room_url,
+            status_code=302,
+            target_status_code=200,
+            fetch_redirect_response=True,
+        )
+
+    def test_invalid_post(self):
+        self.login()
+        res = self.client.post(self._talk_room_url, self._bad_form)
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, "main/talk_room.html")
+        # レンダリングされたテンプレートに第二引数の文字列が含まれるかを検証。
+        self.assertContains(res, "禁止ワード バカ, あほ が含まれています")
