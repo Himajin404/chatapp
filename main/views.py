@@ -1,16 +1,16 @@
 from django.http import HttpResponse
 from django.contrib import auth  # 追加
-from django.shortcuts import redirect, render  # redirect を追加
 from django.contrib.auth import views as auth_views  # 追加
 from .forms import LoginForm, SignUpForm  # LoginForm を追加
 from django.contrib.auth.decorators import login_required  # 追加
-from .models import User  # 追加
 from django.db.models import Q  # 追加
 from django.shortcuts import get_object_or_404, redirect, render  # get_object_or_404 を追加
 from .forms import LoginForm, SignUpForm, TalkForm, UsernameChangeForm, EmailChangeForm  # TalkForm を追加
 from .models import Talk, User  # Talk を追加
 from django.urls import reverse_lazy  # 追加
+import logging
 
+logger = logging.getLooger(__name__)
 
 def index(request):
     return render(request, 'main/index.html')
@@ -65,10 +65,7 @@ def friends(request):
     return render(request, "main/friends.html", context)
 @login_required
 def talk_room(request, user_id):
-    # get_object_or_404 は、第一引数にモデル名、その後任意の数のキーワードを受け取り、
-    # もし合致するデータが存在するならそのデータを、存在しないなら 404 エラーを発生させます。
     friend = get_object_or_404(User, id=user_id)
-
     # 自分が送信者で上の friend が受信者であるデータ、または friend が送信者で friend が受信者であるデータをすべて取得します。
     talks = Talk.objects.filter(
         Q(sender=request.user, receiver=friend)
@@ -87,6 +84,7 @@ def talk_room(request, user_id):
             new_talk.sender = request.user
             new_talk.receiver = friend
             new_talk.save()
+            ogger.info("A message has been sent: %s to %s", request.user.username, friend.username)  # 追加
             return redirect("talk_room", user_id)
 
     context = {

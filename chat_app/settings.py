@@ -136,3 +136,27 @@ try:
 except ImportError:
     # local_settings.py が存在しなくてもエラーにならないようにする
     pass
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "%(levelname)s: %(message)s",
+        }
+    },
+    "handlers": {
+        "stream": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "main": {
+            "handlers": ["stream"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
