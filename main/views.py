@@ -10,7 +10,7 @@ from .models import Talk, User  # Talk を追加
 from django.urls import reverse_lazy  # 追加
 import logging
 
-logger = logging.getLooger(__name__)
+logger = logging.getLogger(__name__)
 
 def index(request):
     return render(request, 'main/index.html')
@@ -84,7 +84,7 @@ def talk_room(request, user_id):
             new_talk.sender = request.user
             new_talk.receiver = friend
             new_talk.save()
-            ogger.info("A message has been sent: %s to %s", request.user.username, friend.username)  # 追加
+            logger.info("A message has been sent: %s to %s", request.user.username, friend.username)  # 追加
             return redirect("talk_room", user_id)
 
     context = {
